@@ -1,0 +1,11 @@
+# Ignora tudo por padrão
+**
+
+# Permite o diretório target e os artefatos de runtime
+!target/
+!target/*-runner
+!target/*-runner.jar
+!target/lib/
+!target/lib/**
+!target/quarkus-app/
+!target/quarkus-app/**
