@@ -41,6 +41,12 @@ public class Order extends PanacheEntityBase {
         return o;
     }
 
+    @PrePersist
+    void onCreate() {
+        if (createdAt == null) createdAt = Instant.now();
+        if (status == null) status = OrderStatus.CREATED;
+    }
+
     public UUID getId() {
         return id;
     }
@@ -61,5 +67,12 @@ public class Order extends PanacheEntityBase {
         return createdAt;
     }
 
-    public void markPaid(){ this.status = OrderStatus.PAID; }
+    public void markPaid() {
+        this.status = OrderStatus.PAID;
+    }
+
+    public void changeStatus(OrderStatus newStatus) {
+        this.status = newStatus;
+    }
+
 }

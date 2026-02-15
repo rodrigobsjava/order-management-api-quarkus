@@ -33,6 +33,11 @@ public class Customer extends PanacheEntityBase {
         this.createdAt = Instant.now();
     }
 
+    @PrePersist
+    void onCreate() {
+        if (createdAt == null) createdAt = Instant.now();
+    }
+
     public UUID getId() {
         return id;
     }
@@ -47,5 +52,13 @@ public class Customer extends PanacheEntityBase {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public void rename(String newName) {
+        this.name = newName;
+    }
+
+    public void changeEmail(String newEmail) {
+        this.email = newEmail;
     }
 }
