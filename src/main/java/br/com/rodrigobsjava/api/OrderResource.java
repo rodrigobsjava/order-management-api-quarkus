@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Path("/orders")
-@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class OrderResource {
 
@@ -27,6 +26,7 @@ public class OrderResource {
     }
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response create(@Valid CreateOrderRequest request) {
         Order o = service.create(request.customerId(), request.amount());
         return Response.created(URI.create("/orders/" + o.getId())).entity(toResponse(o)).build();
@@ -45,6 +45,7 @@ public class OrderResource {
 
     @PATCH
     @Path("/{id}/status")
+    @Consumes(MediaType.APPLICATION_JSON)
     public OrderResponse updateStatus(@PathParam("id") UUID id, @Valid UpdateOrderStatusRequest request) {
         return toResponse(service.updateStatus(id, request.status()));
     }

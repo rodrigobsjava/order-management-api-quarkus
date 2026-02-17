@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Path("/clients")
-@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class CustomerResource {
 
@@ -27,6 +26,7 @@ public class CustomerResource {
     }
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response create(@Valid CreateCustomerRequest request) {
         Customer c = service.create(request.name(), request.email());
         return Response.created(URI.create("/clients/" + c.getId())).entity(toResponse(c)).build();
@@ -45,6 +45,7 @@ public class CustomerResource {
 
     @PUT
     @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
     public CustomerResponse update(@PathParam("id") UUID id, @Valid UpdateCustomerRequest request) {
         Customer c = service.update(id, request.name(), request.email());
         return toResponse(c);
