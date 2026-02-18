@@ -1,6 +1,7 @@
 package br.com.rodrigobsjava.service;
 
 import br.com.rodrigobsjava.domain.Customer;
+import br.com.rodrigobsjava.exception.ConflictException;
 import br.com.rodrigobsjava.repository.CustomerRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -20,6 +21,9 @@ public class CustomerService {
 
     @Transactional
     public Customer create(String name, String email) {
+        if (repo.findByEmail(email).isPresent()) {
+            throw new ConflictException("E-mail already in use");
+        }
         Customer c = new Customer(name, email);
         repo.persist(c);
         return c;
@@ -36,6 +40,11 @@ public class CustomerService {
 
     @Transactional
     public Customer update(UUID id, String name, String email) {
+        repo.findByEmail(email).ifPresent(existing -> {
+            if (!existing.getId().equals(id)) {
+                throw new ConflictException("Email already in use");
+            }
+        });
         Customer c = getOrThrow(id);
         c.rename(name);
         c.changeEmail(email);
