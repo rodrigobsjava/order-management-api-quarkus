@@ -1,80 +1,177 @@
-# order-management-api-quarkus
+# Order Management API (Quarkus)
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+API backend para gerenciamento de **Clientes** e **Pedidos**, construída com **Quarkus**, **PostgreSQL**, **Hibernate ORM + Panache**, **Flyway** e **Docker Compose**.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+> Porta padrão (host): **8056**
 
-## Running the application in dev mode
+## Stack
+- Java 21 + Maven Wrapper (`./mvnw`)
+- Quarkus (RESTEasy Reactive + Jackson)
+- Hibernate ORM + Panache
+- PostgreSQL
+- Flyway (migrations)
+- Docker / Docker Compose
+- Testes: `@QuarkusTest` + RestAssured
 
-You can run your application in dev mode that enables live coding using:
+---
 
-```shell script
-./mvnw quarkus:dev
+## Requisitos
+- Java 21
+- Docker + Docker Compose
+- Git (opcional)
+
+---
+
+## Rodar com Docker (recomendado)
+
+### 1) Configurar variáveis (dev)
+Crie um `.env` local a partir do exemplo:
+
+```bash
+cp .env.example .env
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+> **Importante:** `.env` não é versionado.
 
-## Packaging and running the application
-
-The application can be packaged using:
-
-```shell script
-./mvnw package
+### 2) Build e subir containers
+```bash
+./mvnw clean package -DskipTests
+docker compose up -d --build
 ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
-
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
+### 3) Validar health
+```bash
+curl -i http://localhost:8056/health
+curl -i http://localhost:8056/q/health/ready
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+> Se seu Docker exigir `sudo`, use `sudo docker ...` / `sudo docker compose ...` (ou configure permissão do Docker no seu usuário).
 
-## Creating a native executable
+---
 
-You can create a native executable using:
+## Rodar local (dev mode)
+Use quando quiser live reload:
 
-```shell script
-./mvnw package -Dnative
+```bash
+docker compose up -d
+./mvnw quarkus:dev -Dquarkus.profile=dev
 ```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
+---
 
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
+## Banco de dados (Flyway)
+- Migrations em: `src/main/resources/db/migration`
+- Ao subir a aplicação (profiles `docker`/`prod`), as migrations são aplicadas automaticamente.
+
+---
+
+## Endpoints
+
+### Clientes
+
+Criar:
+```bash
+curl -s -X POST http://localhost:8056/clients \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Rodrigo","email":"rodrigo@email.com"}'
 ```
 
-You can then execute your native executable with: `./target/order-management-api-quarkus-1.0.0-SNAPSHOT-runner`
+Listar:
+```bash
+curl -s http://localhost:8056/clients
+```
 
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
+Buscar por id:
+```bash
+curl -s http://localhost:8056/clients/{id}
+```
 
-## Related Guides
+Atualizar:
+```bash
+curl -s -X PUT http://localhost:8056/clients/{id} \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Rodrigo Barbosa","email":"rodrigo@email.com"}'
+```
 
-- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code for Hibernate ORM via the active record or the repository pattern
-- Hibernate Validator ([guide](https://quarkus.io/guides/validation)): Validate object properties (field, getter) and method parameters for your beans (REST, CDI, Jakarta Persistence)
-- SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui)): Document your REST APIs with OpenAPI - comes with Swagger UI
-- REST ([guide](https://quarkus.io/guides/rest)): A Jakarta REST implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it.
-- JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
-- REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus REST. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it
+Deletar:
+```bash
+curl -i -X DELETE http://localhost:8056/clients/{id}
+```
 
-## Provided Code
+### Pedidos
 
-### Hibernate ORM
+Criar:
+```bash
+curl -s -X POST http://localhost:8056/orders \
+  -H 'Content-Type: application/json' \
+  -d '{"customerId":"{customerId}","amount":129.90}'
+```
 
-Create your first JPA entity
+Listar:
+```bash
+curl -s http://localhost:8056/orders
+```
 
-[Related guide section...](https://quarkus.io/guides/hibernate-orm)
+Buscar por id:
+```bash
+curl -s http://localhost:8056/orders/{id}
+```
 
-[Related Hibernate with Panache section...](https://quarkus.io/guides/hibernate-orm-panache)
+Atualizar status:
+```bash
+curl -s -X PATCH http://localhost:8056/orders/{id}/status \
+  -H 'Content-Type: application/json' \
+  -d '{"status":"PAID"}'
+```
 
+Endpoint de negócio — por status:
+```bash
+curl -s http://localhost:8056/orders/by-status/CREATED
+```
 
-### REST
+Por cliente:
+```bash
+curl -s http://localhost:8056/orders/by-customer/{customerId}
+```
+---
 
-Easily start your REST Web Services
+![Swagger UI](docs/swagger.png)
+![Architecture](docs/architecture.png)
 
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+---
+
+## Padrão de erro (JSON)
+Exemplo de resposta de erro padronizada:
+
+```json
+{
+  "timestamp": "2026-02-18T06:14:32Z",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Customer not found",
+  "path": "clients/{id}"
+}
+```
+
+---
+
+## Testes
+```bash
+./mvnw test
+```
+
+---
+
+## Decisões de projeto (curto e objetivo)
+- **Entidades encapsuladas** (campos `private`, métodos de domínio) para qualidade profissional.
+- **DTOs** para request/response, evitando acoplamento direto entre entidade e API.
+- **Flyway** para versionar schema e garantir reproduzibilidade.
+- **Docker Compose** para subir API + Postgres rapidamente em qualquer máquina.
+
+---
+
+## Roadmap (próximos passos)
+- Melhorar validação com **field errors** (erros por campo)
+- Testes adicionais para Orders (status e filtros)
+- Paginação e ordenação
+- Autenticação (JWT) (opcional)
