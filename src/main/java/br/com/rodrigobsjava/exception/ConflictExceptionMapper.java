@@ -17,11 +17,12 @@ public class ConflictExceptionMapper implements ExceptionMapper<ConflictExceptio
     @Override
     public Response toResponse(ConflictException exception) {
         ApiError body = new ApiError(
-            Instant.now(),
+                Instant.now(),
                 409,
                 "Conflict",
                 exception.getMessage(),
-                uriInfo.getPath()
+                "/" + uriInfo.getPath(),
+                null
         );
 
         return Response.status(Response.Status.CONFLICT).entity(body).build();

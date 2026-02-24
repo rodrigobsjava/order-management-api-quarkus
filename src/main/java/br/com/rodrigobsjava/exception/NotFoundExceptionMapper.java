@@ -20,7 +20,8 @@ public class NotFoundExceptionMapper implements ExceptionMapper<NotFoundExceptio
                 404,
                 "Not Found",
                 exception.getMessage(),
-                uriInfo.getPath()
+                "/" + uriInfo.getPath(),
+                null
         );
         return Response.status(Response.Status.NOT_FOUND).entity(body).build();
     }

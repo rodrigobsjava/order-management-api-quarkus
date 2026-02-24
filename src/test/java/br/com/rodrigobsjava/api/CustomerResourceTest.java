@@ -31,7 +31,9 @@ public class CustomerResourceTest {
         .when()
                 .post("/clients")
         .then()
-                .statusCode(anyOf(is(400), is(422)));
+                .statusCode(400)
+                .body("error",is("Validation Error"))
+                .body("fieldErros.field", hasItems("name","email"));
     }
 
 }
