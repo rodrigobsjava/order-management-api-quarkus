@@ -16,7 +16,7 @@ public class Order extends PanacheEntityBase {
     private UUID id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "costumer_id", nullable = false)
+    @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
     @Enumerated(EnumType.STRING)
@@ -26,7 +26,7 @@ public class Order extends PanacheEntityBase {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     protected Order() {
