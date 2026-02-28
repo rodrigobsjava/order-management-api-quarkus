@@ -1,5 +1,6 @@
 package br.com.rodrigobsjava.api;
 
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -7,6 +8,7 @@ import java.util.UUID;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
+@QuarkusTest
 public class OrderResourcesTest {
 
     @Test
@@ -18,7 +20,7 @@ public class OrderResourcesTest {
             .contentType("application/json")
             .body("{\"name\":\"Test User\",\"email\":\"test.user+" + System.currentTimeMillis() + "@mail.com\"}")
         .when()
-            .post("")
+            .post("/clients")
         .then()
             .statusCode(201)
             .body("id",notNullValue())
@@ -29,12 +31,12 @@ public class OrderResourcesTest {
         UUID orderId =
         given()
             .contentType("application/json")
-            .body("{\" customerId\":\""+customerId+"\",\"amount\":129.90}")
+            .body("{\"customerId\":\""+customerId+"\",\"amount\":129.90}")
         .when()
-            .post("orders")
+            .post("/orders")
         .then()
             .statusCode(201)
-            .body("id",notNullValue())
+            .body("id", notNullValue())
             .body("customerId",is(customerId.toString()))
             .body("status", is("CREATED"))
         .extract()
@@ -64,7 +66,7 @@ public class OrderResourcesTest {
             .get("/orders/by-customer/" + customerId)
         .then()
             .statusCode(200)
-            .body("",hasItem(orderId.toString()));
+            .body("id",hasItem(orderId.toString()));
 
     }
 }

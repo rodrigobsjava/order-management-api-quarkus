@@ -23,9 +23,7 @@ public class Customer extends PanacheEntityBase {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-    protected Customer() {
-
-    }
+    protected Customer() {}
 
     public Customer(String name, String email) {
         this.name = name;
@@ -54,11 +52,7 @@ public class Customer extends PanacheEntityBase {
         return createdAt;
     }
 
-    public void rename(String newName) {
-        this.name = newName;
-    }
+    public void rename(String newName) { this.name = newName; }
 
-    public void changeEmail(String newEmail) {
-        this.email = newEmail;
-    }
+    public void changeEmail(String newEmail) { this.email = newEmail; }
 }

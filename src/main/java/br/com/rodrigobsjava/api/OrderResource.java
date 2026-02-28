@@ -8,8 +8,10 @@ import br.com.rodrigobsjava.dto.UpdateOrderStatusRequest;
 import br.com.rodrigobsjava.service.OrderService;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 
 import java.net.URI;
 import java.util.List;
@@ -27,9 +29,10 @@ public class OrderResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(@Valid CreateOrderRequest request) {
+    public Response create(@Valid CreateOrderRequest request, @Context UriInfo uriInfo) {
         Order o = service.create(request.customerId(), request.amount());
-        return Response.created(URI.create("/orders/" + o.getId())).entity(toResponse(o)).build();
+        URI location = uriInfo.getAbsolutePathBuilder().path(o.getId().toString()).build();
+        return Response.created(location).entity(toResponse(o)).build();
     }
 
     @GET

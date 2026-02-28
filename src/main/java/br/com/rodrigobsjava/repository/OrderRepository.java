@@ -23,7 +23,4 @@ public class OrderRepository implements PanacheRepositoryBase<Order, UUID> {
         return find("select o from Order o join fetch o.customer where o.customer.id = ?1",customerId).list();
     }
 
-    public void persist(Order o) {
-
-    }
 }

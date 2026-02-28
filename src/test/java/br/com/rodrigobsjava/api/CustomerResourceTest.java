@@ -33,7 +33,7 @@ public class CustomerResourceTest {
         .then()
                 .statusCode(400)
                 .body("error",is("Validation Error"))
-                .body("fieldErros.field", hasItems("name","email"));
+                .body("fieldErrors.field", hasItems("name","email"));
     }
 
 }

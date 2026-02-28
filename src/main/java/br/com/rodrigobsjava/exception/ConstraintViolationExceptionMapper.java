@@ -31,13 +31,19 @@ public class ConstraintViolationExceptionMapper implements ExceptionMapper<Const
         ApiError body = new ApiError(
                 Instant.now(),
                 400,
-                "Bad Request",
+                "Validation Error",
                 "Validation failed",
-                "/" + uriInfo.getPath(),
+                normalizePath(uriInfo),
                 fieldErrors
         );
 
         return Response.status(Response.Status.BAD_REQUEST).entity(body).build();
+    }
+
+    private String normalizePath(UriInfo uriInfo) {
+        String p = uriInfo.getPath();
+        if (p == null || p.isBlank()) return "/";
+        return p.startsWith("/") ? p : "/" + p;
     }
 
     private String extractLeafField(ConstraintViolation<?> v) {
@@ -50,4 +56,5 @@ public class ConstraintViolationExceptionMapper implements ExceptionMapper<Const
         }
         return (leaf != null) ? leaf : path.toString();
     }
+
 }
